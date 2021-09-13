@@ -12,6 +12,14 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"console.log(jsonData.entry[10].id);\r",
+							"console.log(jsonData.entry[14].title)\r",
+							"\r",
+							"pm.environment.set(\"entityId\", jsonData.entry[10].id);\r",
+							"pm.environment.set(\"entityTitle\", jsonData.entry[14].title);\r",
+							"\r",
+							"\r",
 							"pm.test(\"Status code should return 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
@@ -19,7 +27,7 @@
 							"    pm.response.to.have.status(\"OK\");\r",
 							"});\r",
 							"\r",
-							"var jsonData = pm.response.json();\r",
+							"\r",
 							"console.log(jsonData)\r",
 							"console.log(jsonData.totalResults)\r",
 							"console.log(jsonData.entry[14].title)\r",
@@ -49,21 +57,26 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://demo.fusio-project.org/index.php/todo",
-					"protocol": "https",
+					"raw": "{{baseURL}}/todo",
 					"host": [
-						"demo",
-						"fusio-project",
-						"org"
+						"{{baseURL}}"
 					],
 					"path": [
-						"index.php",
 						"todo"
 					]
 				}
@@ -72,6 +85,30 @@
 		},
 		{
 			"name": "Get All Entries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status has OK when request is sent\", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate that response has the scope array in it\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"scopes\");\r",
+							"});\r",
+							"pm.test(\"Response time is less than 500ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -98,12 +135,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://demo.fusio-project.org/index.php/todo/?todo_id=2",
-					"protocol": "https",
+					"raw": "{{baseURL}}/index.php/todo/?todo_id={{entityId}}",
 					"host": [
-						"demo",
-						"fusio-project",
-						"org"
+						"{{baseURL}}"
 					],
 					"path": [
 						"index.php",
@@ -113,7 +147,7 @@
 					"query": [
 						{
 							"key": "todo_id",
-							"value": "2"
+							"value": "{{entityId}}"
 						}
 					]
 				},
@@ -127,17 +161,19 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"const response = pm.response.json();\r",
 							"// print any kind of variables/message on the screen\r",
-							"console.log(response[2].name);\r",
+							"console.log(response[3].name);\r",
 							"pm.test(\"Search for a book name called Viscount Who Loved Me\", function (){\r",
 							"    pm.expect(response[3].name).to.eql(\"Viscount Who Loved Me\")\r",
 							"});\r",
+							"console.log(response[1].id);\r",
+							"pm.environment.set(\"JustyID\", response[1].id);\r",
+							"\r",
 							"\r",
 							"/*const Fiction = response.filter((book) => book.type === \"fiction\");\r",
 							"console.log(Fiction)\r",
@@ -158,7 +194,8 @@
 							"\r",
 							"\r",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -166,12 +203,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://simple-books-api.glitch.me/books?type=fiction",
-					"protocol": "https",
+					"raw": "{{baseURL1}}/books?type=fiction",
 					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
+						"{{baseURL1}}"
 					],
 					"path": [
 						"books"
@@ -192,14 +226,24 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
 						"exec": [
-							"const OrderId = pm.response.json();\r",
+							"pm.test(\"Status code should be 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"pm.test(\"Status code shows Created\", function () {\r",
+							"    pm.response.to.have.status(\"Created\");\r",
+							"});\r",
 							"\r",
-							"console.log(OrderId.orderId);\r",
-							"pm.globals.set(\"OrderId\", OrderId.orderId);\r",
+							"pm.test(\"Response returns true when successfully Created\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"true\");\r",
+							"});\r",
+							"const OrderID = pm.response.json();\r",
+							"\r",
+							"console.log(OrderID.orderId);\r",
+							"pm.environment.set(\"OrderID\", OrderID.orderId);\r",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -218,7 +262,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"bookId\": 1,\n  \"customerName\": \"John\"\n}",
+					"raw": "{\n  \"bookId\": {{JustyID}},\n  \"customerName\": \"Paul_paula\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -226,69 +270,18 @@
 					}
 				},
 				"url": {
-					"raw": "https://simple-books-api.glitch.me/orders",
-					"protocol": "https",
+					"raw": "{{baseURL1}}/orders?bookId=1",
 					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
+						"{{baseURL1}}"
 					],
 					"path": [
 						"orders"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Place a book order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const OrderId = pm.response.json();\r",
-							"\r",
-							"console.log(OrderId.orderId);\r",
-							"pm.globals.set(\"OrderId\", OrderId.orderId);\r",
-							""
-						]
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
+					],
+					"query": [
 						{
-							"key": "token",
-							"value": "03c5abfe090876ab74a2a2ac4c079174a35fd88c9b88cd2164ff4b9d56c31d6c",
-							"type": "string"
+							"key": "bookId",
+							"value": "1"
 						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"bookId\": 1,\n  \"customerName\": \"John\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://simple-books-api.glitch.me/orders",
-					"protocol": "https",
-					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
-					],
-					"path": [
-						"orders"
 					]
 				}
 			},
@@ -375,12 +368,9 @@
 					}
 				},
 				"url": {
-					"raw": "https://simple-books-api.glitch.me/orders/:orderId",
-					"protocol": "https",
+					"raw": "{{baseURL1}}/orders/:orderId",
 					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
+						"{{baseURL1}}"
 					],
 					"path": [
 						"orders",
@@ -389,7 +379,7 @@
 					"variable": [
 						{
 							"key": "orderId",
-							"value": "bl8ZbxUCq59bH8DyYWvjo"
+							"value": "{{OrderID}}"
 						}
 					]
 				}
@@ -402,7 +392,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 204\", function () {\r",
 							"    pm.response.to.have.status(204);\r",
@@ -411,7 +400,8 @@
 							"pm.test(\"Status code name has string OK\", function () {\r",
 							"    pm.response.to.have.status(\"No Content\");\r",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -438,12 +428,9 @@
 					}
 				},
 				"url": {
-					"raw": "https://simple-books-api.glitch.me/orders/:orderId",
-					"protocol": "https",
+					"raw": "{{baseURL1}}/orders/:orderId",
 					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
+						"{{baseURL1}}"
 					],
 					"path": [
 						"orders",
@@ -452,7 +439,7 @@
 					"variable": [
 						{
 							"key": "orderId",
-							"value": "bl8ZbxUCq59bH8DyYWvjo"
+							"value": "{{OrderID}}"
 						}
 					]
 				}
