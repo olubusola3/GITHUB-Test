@@ -113,15 +113,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://demo.fusio-project.org/index.php/",
-					"protocol": "https",
+					"raw": "{{baseURL}}/",
 					"host": [
-						"demo",
-						"fusio-project",
-						"org"
+						"{{baseURL}}"
 					],
 					"path": [
-						"index.php",
 						""
 					]
 				},
@@ -131,6 +127,22 @@
 		},
 		{
 			"name": "Get entry per ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Status should show Ok\", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -294,7 +306,13 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							""
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code name has string OK\", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -326,12 +344,9 @@
 					}
 				},
 				"url": {
-					"raw": "https://simple-books-api.glitch.me/orders",
-					"protocol": "https",
+					"raw": "{{baseURL1}}/orders",
 					"host": [
-						"simple-books-api",
-						"glitch",
-						"me"
+						"{{baseURL1}}"
 					],
 					"path": [
 						"orders"
@@ -342,6 +357,23 @@
 		},
 		{
 			"name": "Get an order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code name has string OK\", function () {\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
